@@ -2,7 +2,6 @@
 -- INFO
 -----------------------------------------------------
 
-
 script_name("AutoGarbageTruck")
 script_authors("Rajaneesh R")
 script_version("1.0.0")
@@ -12,6 +11,7 @@ pcall(require, "sflua")
 -----------------------------------------------------
 -- HEADERS & CONFIG
 -----------------------------------------------------
+
 require "lib.moonloader"
 require "lib.sampfuncs"
 require "lib.vkeys"
@@ -42,9 +42,11 @@ else
             "---- {AAAAFF}Auto Garbage Truck: {FFFFFF}Config file creation failed - contact the developer for help.", -1)
     end
 end
+
 -----------------------------------------------------
 -- MAIN SCRIPT
 -----------------------------------------------------
+
 local autoGarbageTruckerEnabled = true
 local insideTrashMaster = false
 local sentPickuptrashCommand = false
@@ -90,11 +92,11 @@ end
 -----------------------------------------------------
 -- EVENT HANDLERS
 -----------------------------------------------------
+
 function sampev.onSendEnterVehicle(vehicleid, passenger)
     playerIDResult, PLAYER_ID = sampGetPlayerIdByCharHandle(PLAYER_PED)
-    print(vehicleid, PLAYER_ID)
-    -- VehicleID for TRASHMASTER is 416
 
+    -- VehicleID for TRASHMASTER is 416
     if (vehicleid == 416) and autoGarbageTruckerEnabled then
         insideTrashMaster = true
         pickedUpTrash = true
