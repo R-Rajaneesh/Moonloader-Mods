@@ -48,17 +48,17 @@ end
 -----------------------------------------------------
 
 local autoGarbageTruckerEnabled = true
-local insideTrashMaster = false
 local sentPickuptrashCommand = false
+local insideVehicle = false
 function main()
     -- Waiting to meet startup conditions
     repeat wait(50) until isSampAvailable()
-    -- repeat wait(50) until string.find(sampGetCurrentServerName(), "Horizon Roleplay")
+    repeat wait(50) until string.find(sampGetCurrentServerName(), "Horizon Roleplay")
     sampRegisterChatCommand("agt", function()
         if config_table.Options.autoGarbageTruckerEnabled then
             config_table.Options.autoGarbageTruckerEnabled = false
             if inicfg.save(config_table, config_file_path) then
-                autoGarbageTruckerEnabled = config_table.Options.autoGarbageTruckerEnabled
+                autoGarbageTruckerEnabled = false
                 sampAddChatMessage("--- {AAAAFF}Auto Garbage Trucker : {FFFFFF}Off", -1)
             else
                 sampAddChatMessage(
@@ -68,7 +68,7 @@ function main()
         else
             config_table.Options.autoGarbageTruckerEnabled = true
             if inicfg.save(config_table, config_file_path) then
-                autoGarbageTruckerEnabled = config_table.Options.autoGarbageTruckerEnabled
+                autoGarbageTruckerEnabled = true
                 sampAddChatMessage("--- {AAAAFF}Auto Garbage Trucker: {FFFFFF}On", -1)
             else
                 sampAddChatMessage(
@@ -81,10 +81,16 @@ function main()
         "--- {8d49d1}AutoGarbageTruck" .. script.this.version .. " {FFFFFF}by {8d49d1}Rajaneesh R{FFFFFF} ---", -1)
     while true do
         wait(0)
-        if autoGarbageTruckerEnabled and insideTrashMaster and sentPickuptrashCommand == false then
+        if insideVehicle and autoGarbageTruckerEnabled and not sentPickuptrashCommand then
             wait(3500)
-            sampSendChat("/pickuptrash")
-            sentPickuptrashCommand = true
+            -- TRASHMASTER VEHICLE MODEL ID IS 408
+            if (getCarModel(storeCarCharIsInNoSave(PLAYER_PED)) == 408)
+            then
+                sentPickuptrashCommand = true
+                insideVehicle = true
+                sampSendChat("/pickuptrash")
+                sampAddChatMessage("Picking up trash", -1)
+            end
         end
     end
 end
@@ -94,25 +100,18 @@ end
 -----------------------------------------------------
 
 function sampev.onSendEnterVehicle(vehicleid, passenger)
-    playerIDResult, PLAYER_ID = sampGetPlayerIdByCharHandle(PLAYER_PED)
-
-    -- VehicleID for TRASHMASTER is 416
-    if (vehicleid == 416) and autoGarbageTruckerEnabled then
-        insideTrashMaster = true
-        pickedUpTrash = true
-    end
+    insideVehicle = true
 end
 
 function sampev.onSendExitVehicle(vehicleid)
-    if (vehicleid == 416) and pickedUpTrash then
-        insideTrashMaster = false
-    end
+    sampSendChat("/kcp")
+    insideVehicle = false
+    sentPickuptrashCommand = false
 end
 
 function sampev.onServerMessage(c, text)
     if text:match("* You have been paid $450 for picking up the garbage and returning the garbage truck.") then
-        pickedUpTrash = false
-        insideTrashMaster = false
+        insideVehicle = false
         sentPickuptrashCommand = false
     end
 end
