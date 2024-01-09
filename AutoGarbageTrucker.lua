@@ -82,14 +82,13 @@ function main()
     while true do
         wait(0)
         if insideVehicle and autoGarbageTruckerEnabled and not sentPickuptrashCommand then
-            wait(3500)
+            wait(4000)
             -- TRASHMASTER VEHICLE MODEL ID IS 408
             if (getCarModel(storeCarCharIsInNoSave(PLAYER_PED)) == 408)
             then
                 sentPickuptrashCommand = true
                 insideVehicle = true
                 sampSendChat("/pickuptrash")
-                sampAddChatMessage("Picking up trash", -1)
             end
         end
     end
@@ -104,9 +103,11 @@ function sampev.onSendEnterVehicle(vehicleid, passenger)
 end
 
 function sampev.onSendExitVehicle(vehicleid)
-    sampSendChat("/kcp")
-    insideVehicle = false
-    sentPickuptrashCommand = false
+    if (getCarModel(storeCarCharIsInNoSave(PLAYER_PED)) == 408) then
+        sampSendChat("/kcp")
+        insideVehicle = false
+        sentPickuptrashCommand = false
+    end
 end
 
 function sampev.onServerMessage(c, text)
