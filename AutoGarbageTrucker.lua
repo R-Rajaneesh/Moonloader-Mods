@@ -82,13 +82,14 @@ function main()
     while true do
         wait(0)
         if insideVehicle and autoGarbageTruckerEnabled and not sentPickuptrashCommand then
-            wait(4000)
             -- TRASHMASTER VEHICLE MODEL ID IS 408
-            if (getCarModel(storeCarCharIsInNoSave(PLAYER_PED)) == 408)
-            then
-                sentPickuptrashCommand = true
-                insideVehicle = true
-                sampSendChat("/pickuptrash")
+            if isCharInCar(PLAYER_PED, storeCarCharIsInNoSave(PLAYER_PED)) then
+                if (getCarModel(storeCarCharIsInNoSave(PLAYER_PED)) == 408)
+                then
+                    sentPickuptrashCommand = true
+                    insideVehicle = true
+                    sampSendChat("/pickuptrash")
+                end
             end
         end
     end
