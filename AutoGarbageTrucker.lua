@@ -1,10 +1,9 @@
 -----------------------------------------------------
 -- INFO
 -----------------------------------------------------
-
 script_name("AutoGarbageTruck")
 script_authors("Rajaneesh R")
-script_version("1.0.0")
+script_version("1.1.0")
 script_dependencies("SAMPFUNCS ^5.3")
 pcall(require, "sflua")
 
@@ -21,7 +20,9 @@ require "lib.game.weapons"
 local sampev = require "lib.samp.events"
 local inicfg = require "inicfg"
 local config_dir_path = getWorkingDirectory() .. "\\config\\"
-if not doesDirectoryExist(config_dir_path) then createDirectory(config_dir_path) end
+if not doesDirectoryExist(config_dir_path) then
+    createDirectory(config_dir_path)
+end
 local config_file_path = config_dir_path .. "AutoGarbageTrucker.ini"
 
 config_dir_path = nil
@@ -35,7 +36,7 @@ else
     new_config:close()
     new_config = nil
 
-    config_table = { Options = { autoGarbageTruckerEnabled = true } }
+    config_table = {Options={autoGarbageTruckerEnabled=true}}
 
     if not inicfg.save(config_table, config_file_path) then
         sampAddChatMessage(
@@ -50,10 +51,17 @@ end
 local autoGarbageTruckerEnabled = true
 local sentPickuptrashCommand = false
 local insideVehicle = false
+local donekcp = false
 function main()
     -- Waiting to meet startup conditions
-    repeat wait(50) until isSampAvailable()
-    repeat wait(50) until string.find(sampGetCurrentServerName(), "Horizon Roleplay")
+    repeat
+        wait(50)
+    until isSampAvailable()
+    repeat
+        wait(50)
+    until string.find(sampGetCurrentServerName(), "Horizon Roleplay")
+    sampAddChatMessage("--- {8d49d1}AutoGarbageTruck" .. script.this.version
+                           .. " {FFFFFF}by {8d49d1}Rajaneesh R{FFFFFF} ---", -1)
     sampRegisterChatCommand("agt", function()
         if config_table.Options.autoGarbageTruckerEnabled then
             config_table.Options.autoGarbageTruckerEnabled = false
@@ -77,15 +85,14 @@ function main()
             end
         end
     end)
-    sampAddChatMessage(
-        "--- {8d49d1}AutoGarbageTruck" .. script.this.version .. " {FFFFFF}by {8d49d1}Rajaneesh R{FFFFFF} ---", -1)
+
     while true do
         wait(0)
-        if insideVehicle and autoGarbageTruckerEnabled and not sentPickuptrashCommand then
+        if autoGarbageTruckerEnabled and insideVehicle and not sentPickuptrashCommand then
             -- TRASHMASTER VEHICLE MODEL ID IS 408
             if isCharInCar(PLAYER_PED, storeCarCharIsInNoSave(PLAYER_PED)) then
-                if (getCarModel(storeCarCharIsInNoSave(PLAYER_PED)) == 408)
-                then
+                if (getCarModel(storeCarCharIsInNoSave(PLAYER_PED)) == 408) then
+                    wait(100)
                     sentPickuptrashCommand = true
                     insideVehicle = true
                     sampSendChat("/pickuptrash")
@@ -100,20 +107,51 @@ end
 -----------------------------------------------------
 
 function sampev.onSendEnterVehicle(vehicleid, passenger)
+
     insideVehicle = true
+
 end
 
 function sampev.onSendExitVehicle(vehicleid)
-    if (getCarModel(storeCarCharIsInNoSave(PLAYER_PED)) == 408) then
+
+    if (getCarModel(storeCarCharIsInNoSave(PLAYER_PED)) == 408) and not donekcp then
+        donekcp = true
         sampSendChat("/kcp")
+        donekcp = false
         insideVehicle = false
         sentPickuptrashCommand = false
+        removeWaypoint()
     end
+
 end
 
 function sampev.onServerMessage(c, text)
+
     if text:match("* You have been paid $450 for picking up the garbage and returning the garbage truck.") then
         insideVehicle = false
         sentPickuptrashCommand = false
     end
+
+end
+
+function sampev.onSetCheckpoint(pos, radius)
+
+    if autoGarbageTruckerEnabled and insideVehicle and sentPickuptrashCommand then
+        posx = math.floor(pos.x)
+        posy = math.floor(pos.y)
+        posz = math.floor(pos.z)
+        if (posx == 1423 and posy == -1319 and posz == 13) then
+            sampAddChatMessage("Your {1BCCFF}garbage pickup {FFFFFF}location is at {FF0000}Materials Pickup 1", -1)
+
+        elseif (posx == 1665 and posy == -1003 and posz == 24) then
+            sampAddChatMessage("Your {1BCCFF}garbage pickup {FFFFFF}location is at {FF0000}Muholland Intersection", -1)
+
+        elseif (posx == 1142 and posy == -1351 and posz == 13) then
+            sampAddChatMessage("Your {1BCCFF}garbage pickup {FFFFFF}location is behind {FF0000}All Saints", -1)
+
+        end
+        placeWaypoint(posx, posy, posz)
+
+    end
+
 end
