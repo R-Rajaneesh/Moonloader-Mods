@@ -5,7 +5,7 @@ script_name("AutoGarbageTruck")
 
 script_authors("Rajaneesh R")
 
-script_version("1.1.0")
+script_version("1.2.0")
 
 script_dependencies("SAMPFUNCS ^5.3")
 
