@@ -1,6 +1,6 @@
------------------------------------------------------
+----------------------------------------------------------------------
 -- INFO
------------------------------------------------------
+----------------------------------------------------------------------
 script_name("AutoGarbageTruck")
 
 script_authors("Rajaneesh R")
@@ -11,9 +11,9 @@ script_dependencies("SAMPFUNCS ^5.3")
 
 pcall(require, "sflua")
 
------------------------------------------------------
+----------------------------------------------------------------------
 -- HEADERS & CONFIG
------------------------------------------------------
+----------------------------------------------------------------------
 
 require "lib.moonloader"
 
@@ -62,15 +62,16 @@ else
     if not inicfg.save(config_table, config_file_path) then
 
         sampAddChatMessage(
-            "---- {AAAAFF}Auto Garbage Truck: {FFFFFF}Config file creation failed - contact the developer for help.", -1)
+            "----- {AAAAFF}Auto Garbage Truck: {ffffff}Config file creation failed - contact the developer for help.",
+            -1)
 
     end
 
 end
 
------------------------------------------------------
+----------------------------------------------------------------------
 -- MAIN SCRIPT
------------------------------------------------------
+----------------------------------------------------------------------
 
 local autoGarbageTruckerEnabled = true
 
@@ -102,10 +103,23 @@ function main()
 
     until string.find(sampGetCurrentServerName(), "Horizon Roleplay")
 
-    sampAddChatMessage("--- {8d49d1}AutoGarbageTruck (v" .. script.this.version
-                           .. ") {FFFFFF}by {8d49d1}Rajaneesh R{FFFFFF} ---", -1)
+    sampAddChatMessage("---- {8d49d1}AutoGarbageTruck (v" .. script.this.version
+                           .. ") {ffffff}by {8d49d1}Rajaneesh R{ffffff} ----", -1)
 
     sampTextdrawDelete(520)
+
+    sampRegisterChatCommand("agthelp", function()
+
+        sampAddChatMessage("---- {8d49d1}AutoGarbageTruck (v" .. script.this.version
+                               .. ") {ffffff}by {8d49d1}Rajaneesh R{ffffff} ----", -1)
+        sampAddChatMessage("---- {8d49d1}AutoGarbageTruck (v" .. script.this.version .. ") HELP MENU----", -1)
+        sampAddChatMessage("---- [{ff0000}/agthelp{ffffff}] - Displays AutoGarbageTruck Help Menu ----", -1)
+        sampAddChatMessage("---- [{ff0000}/agt{ffffff}] - Enable/Disable AutoGarbageTruck ----", -1)
+        sampAddChatMessage(
+            "---- [{ff0000}/agtclear{ffffff}] - Clear AutoGarbageTruck's waypoint and clears the job ----", -1)
+        sampAddChatMessage("----------------------------------------------------------------", -1)
+
+    end)
 
     sampRegisterChatCommand("agt", function()
 
@@ -117,12 +131,12 @@ function main()
 
                 autoGarbageTruckerEnabled = false
 
-                sampAddChatMessage("--- {AAAAFF}Auto Garbage Trucker : {FFFFFF}Off", -1)
+                sampAddChatMessage("---- {AAAAFF}Auto Garbage Trucker : {ffffff}Off", -1)
 
             else
 
                 sampAddChatMessage(
-                    "--- {AAAAFF}Auto Garbage Trucker: {FFFFFF}Reminder toggle in config failed - contact the developer for help.",
+                    "---- {AAAAFF}Auto Garbage Trucker: {ffffff}Reminder toggle in config failed - contact the developer for help.",
                     -1)
 
             end
@@ -135,16 +149,34 @@ function main()
 
                 autoGarbageTruckerEnabled = true
 
-                sampAddChatMessage("--- {AAAAFF}Auto Garbage Trucker: {FFFFFF}On", -1)
+                sampAddChatMessage("---- {AAAAFF}Auto Garbage Trucker: {ffffff}On", -1)
             else
 
                 sampAddChatMessage(
-                    "--- {AAAAFF}Auto Garbage Trucker: {FFFFFF}Reminder toggle in config failed - contact the developer for help.",
+                    "---- {AAAAFF}Auto Garbage Trucker: {ffffff}Reminder toggle in config failed - contact the developer for help.",
                     -1)
 
             end
 
         end
+
+    end)
+
+    sampRegisterChatCommand("agtclear", function()
+
+        donekcp = true
+
+        sampSendChat("/kcp")
+
+        donekcp = false
+
+        insideVehicle = false
+
+        sentPickuptrashCommand = false
+
+        removeWaypoint()
+
+        sampTextdrawDelete(520)
 
     end)
 
@@ -178,9 +210,9 @@ function main()
 
 end
 
------------------------------------------------------
+----------------------------------------------------------------------
 -- EVENT HANDLERS
------------------------------------------------------
+----------------------------------------------------------------------
 
 function createGarbageTruckLocation(textToShow)
 
@@ -194,7 +226,7 @@ function createGarbageTruckLocation(textToShow)
 
     sampTextdrawSetAlign(520, 2)
 
-    sampTextdrawSetLetterSizeAndColor(520, textSize / 4, textSize, 0xFFFFFFFF)
+    sampTextdrawSetLetterSizeAndColor(520, textSize / 4, textSize, 0xffffffFF)
 
     sampTextdrawSetBoxColorAndSize(520, 1, 0x50000000, 0, game_resY * textSize * #textToShow / 70)
 
@@ -240,7 +272,7 @@ function sampev.onServerMessage(c, text)
 
     elseif text:match("* Return the garbage truck to the department of sanitation.") then
 
-        sampAddChatMessage("Your have {1BCCFF}picked up garbage{FFFFFF} head back to {FF0000}Ocean Docks.", -1)
+        sampAddChatMessage("Your have {1BCCFF}picked up garbage{ffffff} head back to {FF0000}Ocean Docks.", -1)
 
         location = "Go back to Ocean Docks"
 
@@ -262,7 +294,7 @@ function sampev.onSetCheckpoint(pos, radius)
 
         if (posx == 1423 and posy == -1319 and posz == 13) then
 
-            sampAddChatMessage("Your {1BCCFF}garbage pickup {FFFFFF}location is at {FF0000}Materials Pickup 1.", -1)
+            sampAddChatMessage("Your {1BCCFF}garbage pickup {ffffff}location is at {FF0000}Materials Pickup 1.", -1)
 
             location = "Pickup garbage from Materials Pickup 1."
 
@@ -270,14 +302,14 @@ function sampev.onSetCheckpoint(pos, radius)
 
             if (posx == 1665 and posy == -1003 and posz == 24) then
 
-                sampAddChatMessage("Your {1BCCFF}garbage pickup {FFFFFF}location is at {FF0000}Muholland Intersection.",
+                sampAddChatMessage("Your {1BCCFF}garbage pickup {ffffff}location is at {FF0000}Muholland Intersection.",
                     -1)
 
                 location = "Pickup garbage from Muholland Intersection parking."
 
             elseif (posx == 1142 and posy == -1351 and posz == 13) then
 
-                sampAddChatMessage("Your {1BCCFF}garbage pickup {FFFFFF}location is behind {FF0000}All Saints.", -1)
+                sampAddChatMessage("Your {1BCCFF}garbage pickup {ffffff}location is behind {FF0000}All Saints.", -1)
 
                 location = "Pickup garbage from the backside of All Saints."
 
